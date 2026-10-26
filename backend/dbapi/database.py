@@ -5,22 +5,25 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 
 load_dotenv()
 
-database_url = os.getenv("DATABASE_URL", "").strip()
+DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
 
-# Normalize postgres:// scheme commonly provided by Supabase / Heroku
-if database_url.startswith("postgres://"):
-    database_url = database_url.replace("postgres://", "postgresql://", 1)
+if not DATABASE_URL:
+    DATABASE_URL = "sqlite:///./patients.db"
 
-# Fallback to local SQLite if no remote database URL is configured
-if not database_url:
-    database_url = "sqlite:///./patients.db"
+# Ensure PostgreSQL explicitly uses psycopg2 to eliminate ambiguity
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+psycopg2://", 1)
+elif DATABASE_URL.startswith("postgresql://") and "+psycopg" not in DATABASE_URL:
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg2://", 1)
+
+database_url = DATABASE_URL
 
 connect_args = {}
-if database_url.startswith("sqlite"):
+if DATABASE_URL.startswith("sqlite"):
     connect_args["check_same_thread"] = False
 
 engine = create_engine(
-    database_url,
+    DATABASE_URL,
     connect_args=connect_args,
     pool_pre_ping=True,
 )

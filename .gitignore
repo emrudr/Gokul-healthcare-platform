@@ -9,6 +9,17 @@ __pycache__/
 # Node dependencies
 node_modules/
 
+# Virtual environments
+venv/
+backend/venv/
+.venv/
+backend/.venv/
+
+# Environment files
+.env
+backend/.env
+.env.local
+
 # OS files
 .DS_Store
 Thumbs.db
