@@ -75,8 +75,10 @@ def generate_biomarker_remarks(glucose: float, haemoglobin: float, cholesterol: 
         f"State which values are normal or abnormal, potential clinical implications, and general guidance."
     )
 
+    model_name = os.getenv("GROQ_MODEL", "openai/gpt-oss-20b").strip()
+
     payload = {
-        "model": "llama-3.1-8b-instant",
+        "model": model_name,
         "messages": [
             {
                 "role": "system",
