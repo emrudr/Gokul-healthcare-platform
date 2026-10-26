@@ -20,7 +20,7 @@ function Spinner({ dark }) {
 
 // ─── ALERT BANNER ─────────────────────────────────────────────────────────────
 function Alert({ type = 'error', message, onDismiss }) {
-  const icons = { error: '✕', success: '✓', warning: '⚠' };
+  const icons = { error: '!', success: 'OK', warning: '!' };
   if (!message) return null;
   return (
     <div className={`alert alert--${type}`}>
@@ -31,7 +31,7 @@ function Alert({ type = 'error', message, onDismiss }) {
           onClick={onDismiss}
           style={{ background: 'none', border: 'none', cursor: 'pointer', marginLeft: 'auto', fontSize: '14px', opacity: 0.6 }}
         >
-          ✕
+          X
         </button>
       )}
     </div>
@@ -158,10 +158,10 @@ function PatientModal({ patient, mode, onClose, onSaved, onDeleted }) {
               {isEdit ? 'Patient Details' : 'Add New Patient'}
             </div>
             {isEdit && patient?.id && (
-              <div className="modal__subtitle">Patient ID #{patient.id} · {patient.full_name}</div>
+              <div className="modal__subtitle">Patient ID #{patient.id} | {patient.full_name}</div>
             )}
           </div>
-          <button className="modal__close" onClick={onClose} aria-label="Close modal">✕</button>
+          <button className="modal__close" onClick={onClose} aria-label="Close modal">X</button>
         </div>
 
         {/* BODY */}
@@ -263,7 +263,7 @@ function PatientModal({ patient, mode, onClose, onSaved, onDeleted }) {
                 onClick={handleCheckRemarks}
                 disabled={checkingRemarks}
               >
-                {checkingRemarks ? <><Spinner dark /> Checking…</> : '⚕ Check Remarks'}
+                {checkingRemarks ? <><Spinner dark /> Checking...</> : 'Check Remarks'}
               </button>
             </div>
             <div className="remarks-body">
@@ -287,7 +287,7 @@ function PatientModal({ patient, mode, onClose, onSaved, onDeleted }) {
                 onClick={handleDelete}
                 disabled={deleting || saving}
               >
-                {deleting ? <><Spinner /> Deleting…</> : '🗑 Delete Patient'}
+                {deleting ? <><Spinner /> Deleting...</> : 'Delete Patient'}
               </button>
             )}
           </div>
@@ -301,7 +301,7 @@ function PatientModal({ patient, mode, onClose, onSaved, onDeleted }) {
               disabled={saving || deleting}
             >
               {saving
-                ? <><Spinner /> {isEdit ? 'Updating…' : 'Saving…'}</>
+                ? <><Spinner /> {isEdit ? 'Updating...' : 'Saving...'}</>
                 : isEdit ? 'Upload Changes' : 'Save Patient'}
             </button>
           </div>
@@ -380,7 +380,7 @@ export default function App() {
       {/* PAGE HEADER */}
       <header className="page-header">
         <h1 className="page-header__title">Gokul Healthcare Platform</h1>
-        <p className="page-header__subtitle">Task2 — prepared by Rudransh</p>
+        <p className="page-header__subtitle">Task2 - prepared by Rudransh</p>
       </header>
 
       {/* MAIN CONTENT */}
@@ -416,7 +416,7 @@ export default function App() {
             disabled={loading}
             title="Refresh patient list"
           >
-            {loading ? <Spinner dark /> : '↻'} Refresh
+            {loading ? <Spinner dark /> : null} Refresh
           </button>
         </div>
 
@@ -439,14 +439,21 @@ export default function App() {
               {loading ? (
                 <tr className="loading-row">
                   <td colSpan={8}>
-                    <Spinner dark /> &nbsp; Loading patient records…
+                    <Spinner dark /> Loading patient records...
                   </td>
                 </tr>
               ) : patients.length === 0 ? (
                 <tr>
                   <td colSpan={8}>
                     <div className="empty-state">
-                      <div className="empty-state__icon">🗂</div>
+                      <div className="empty-state__icon">
+                        <svg width="40" height="40" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <rect x="2" y="8" width="28" height="20" rx="0" stroke="#A8A8A8" strokeWidth="1.5" fill="none"/>
+                          <rect x="2" y="8" width="28" height="6" fill="#E0E0E0"/>
+                          <line x1="12" y1="11" x2="20" y2="11" stroke="#A8A8A8" strokeWidth="1.5"/>
+                          <rect x="2" y="2" width="28" height="6" fill="#C6C6C6" stroke="#A8A8A8" strokeWidth="1.5"/>
+                        </svg>
+                      </div>
                       <div className="empty-state__msg">No patient records found</div>
                       <div className="empty-state__sub">Click "Add New Patient" to create the first record</div>
                     </div>
@@ -462,11 +469,13 @@ export default function App() {
                     <td className="td--num">{p.glucose}</td>
                     <td className="td--num">{p.haemoglobin}</td>
                     <td className="td--num">{p.cholesterol}</td>
-                    <td className="td--remarks">
-                      {p.remarks
-                        ? p.remarks
-                        : <span style={{ color: 'var(--gray-40)', fontStyle: 'italic' }}>—</span>
-                      }
+                    <td
+                      className="td--remarks"
+                      title={p.remarks || undefined}
+                    >
+                      {p.remarks || (
+                        <span style={{ color: 'var(--gray-40)', fontStyle: 'italic' }}>-</span>
+                      )}
                     </td>
                   </tr>
                 ))
