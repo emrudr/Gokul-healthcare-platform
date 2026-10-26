@@ -1,0 +1,14 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# SQLite test databases
+*.db
+
+# Node dependencies
+node_modules/
+
+# OS files
+.DS_Store
+Thumbs.db

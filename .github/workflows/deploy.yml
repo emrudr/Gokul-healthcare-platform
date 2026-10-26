@@ -15,8 +15,11 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            set -e
             cd /home/ubuntu/gokul-healthcare-platform
-            git pull origin main
+            git fetch origin main
+            git reset --hard origin/main
+            git clean -fd
             sudo systemctl restart fastapi
             cd frontend
             npm run build
