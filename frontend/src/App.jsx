@@ -56,6 +56,7 @@ function PatientModal({ patient, mode, onClose, onSaved, onDeleted }) {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [checkingRemarks, setCheckingRemarks] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const firstInputRef = useRef(null);
   useEffect(() => {
@@ -127,11 +128,12 @@ function PatientModal({ patient, mode, onClose, onSaved, onDeleted }) {
     }
   }
 
-  async function handleDelete() {
-    const confirmed = window.confirm(
-      `Are you sure you want to delete the record for "${patient?.full_name}"?\n\nThis action cannot be undone.`
-    );
-    if (!confirmed) return;
+  function requestDelete() {
+    setError('');
+    setConfirmDelete(true);
+  }
+
+  async function executeDelete() {
     setDeleting(true);
     setError('');
     try {
@@ -141,10 +143,12 @@ function PatientModal({ patient, mode, onClose, onSaved, onDeleted }) {
     } catch (err) {
       setError(err.message);
       setDeleting(false);
+      setConfirmDelete(false);
     }
   }
 
   function handleOverlayClick(e) {
+    if (confirmDelete) return;
     if (e.target === e.currentTarget) onClose();
   }
 
@@ -283,19 +287,21 @@ function PatientModal({ patient, mode, onClose, onSaved, onDeleted }) {
           <div>
             {isEdit && (
               <button
+                type="button"
                 className="btn btn--danger"
-                onClick={handleDelete}
+                onClick={requestDelete}
                 disabled={deleting || saving}
               >
-                {deleting ? <><Spinner /> Deleting...</> : 'Delete Patient'}
+                Delete Patient
               </button>
             )}
           </div>
           <div className="modal__footer-right">
-            <button className="btn btn--secondary" onClick={onClose} disabled={saving || deleting}>
+            <button type="button" className="btn btn--secondary" onClick={onClose} disabled={saving || deleting}>
               Cancel
             </button>
             <button
+              type="button"
               className="btn btn--primary"
               onClick={handleSave}
               disabled={saving || deleting}
@@ -307,6 +313,67 @@ function PatientModal({ patient, mode, onClose, onSaved, onDeleted }) {
           </div>
         </div>
       </div>
+
+      {/* IN-APP CONFIRMATION MODAL (never auto-closed by browser) */}
+      {confirmDelete && (
+        <div
+          className="modal-overlay modal-overlay--nested"
+          onClick={(e) => {
+            if (e.target === e.currentTarget && !deleting) setConfirmDelete(false);
+          }}
+          role="alertdialog"
+          aria-modal="true"
+        >
+          <div className="modal modal--confirm">
+            <div className="modal__header" style={{ background: '#da1e28' }}>
+              <div>
+                <div className="modal__title">Confirm Deletion</div>
+                {patient?.id && (
+                  <div className="modal__subtitle">Patient ID #{patient.id}</div>
+                )}
+              </div>
+              <button
+                type="button"
+                className="modal__close"
+                onClick={() => !deleting && setConfirmDelete(false)}
+                disabled={deleting}
+                aria-label="Close confirmation"
+              >
+                X
+              </button>
+            </div>
+
+            <div className="modal__body" style={{ padding: '24px' }}>
+              <p style={{ margin: 0, fontSize: '14px', lineHeight: 1.5, color: 'var(--gray-90)' }}>
+                Are you sure you want to delete the record for <strong>{patient?.full_name}</strong>?
+              </p>
+              <p style={{ margin: '10px 0 0', fontSize: '13px', color: 'var(--gray-60)', lineHeight: 1.45 }}>
+                This action cannot be undone. All clinical biomarker records and generated remarks will be permanently removed.
+              </p>
+            </div>
+
+            <div className="modal__footer" style={{ justifyContent: 'flex-end', gap: '8px' }}>
+              <button
+                type="button"
+                className="btn btn--secondary"
+                onClick={() => setConfirmDelete(false)}
+                disabled={deleting}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="btn btn--danger"
+                onClick={executeDelete}
+                disabled={deleting}
+                autoFocus
+              >
+                {deleting ? <><Spinner /> Deleting...</> : 'Yes, I am sure'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

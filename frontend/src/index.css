@@ -596,6 +596,21 @@ textarea.form-textarea {
   margin-bottom: 12px;
 }
 
+/* ── CONFIRMATION MODAL ───────────────────────────── */
+.modal-overlay--nested {
+  z-index: 1100;
+  background: rgba(0, 0, 0, 0.65);
+}
+.modal--confirm {
+  max-width: 460px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  animation: modalPopIn 140ms ease-out;
+}
+@keyframes modalPopIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
 /* ── RESPONSIVE ───────────────────────────────────── */
 @media (max-width: 768px) {
   .main-content { padding: 0 16px 24px; }
@@ -606,3 +621,4 @@ textarea.form-textarea {
   .form-field { border-right: none; }
   .modal { max-height: 98vh; }
 }
+
